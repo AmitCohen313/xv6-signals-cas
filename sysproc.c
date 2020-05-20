@@ -30,16 +30,48 @@ int
 sys_kill(void)
 {
   int pid;
+  int signum;
 
-  if(argint(0, &pid) < 0)
+  if(argint(0, &pid) < 0 || argint(1, &signum) < 0)
     return -1;
-  return kill(pid);
+  return kill(pid,signum);
 }
 
 int
 sys_getpid(void)
 {
   return myproc()->pid;
+}
+
+int
+sys_sigret(void)
+{
+  sigret();
+  return 0;
+}
+
+int
+sys_sigprocmask(void)
+{
+  int mask;
+
+  if (argint(0, &mask) < 0)
+    return -1;
+  return sigprocmask(mask);
+}
+
+int
+sys_sigaction(void)
+{
+  int signum;
+  struct sigaction *act;
+  struct sigaction *oldact;
+
+  if (argint(0, &signum) < 0 || argptr(1, (void*)&act, sizeof(*act)) < 0 || argptr(2, (void*)&oldact, sizeof(*oldact)) < 0) {
+    return -1;
+  }
+  
+  return sigaction(signum, act, oldact);
 }
 
 int

@@ -9,6 +9,7 @@ struct spinlock;
 struct sleeplock;
 struct stat;
 struct superblock;
+struct sigaction;
 
 // bio.c
 void            binit(void);
@@ -107,7 +108,7 @@ int             cpuid(void);
 void            exit(void);
 int             fork(void);
 int             growproc(int);
-int             kill(int);
+int             kill(int, int);
 struct cpu*     mycpu(void);
 struct proc*    myproc();
 void            pinit(void);
@@ -120,6 +121,16 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+uint            sigprocmask(uint sigmask);
+int             sigaction(int, const struct sigaction *, struct sigaction *);
+void            sigret(void);
+void            sigkillfunc(void);
+void            sigstopfunc(void);
+void            sigcontfunc(void);
+void            signaluserhandle(int);
+void            signalkernelhandle(int);
+int             check_for_cont_signals(void);
+int             is_singal_pending_and_not_masked(int);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -188,3 +199,5 @@ void            clearpteu(pde_t *pgdir, char *uva);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
+// Returns x[index] in an integer.
+#define BITAT(x,index) (x & (1 << index))

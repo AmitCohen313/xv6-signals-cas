@@ -130,6 +130,23 @@ xchg(volatile uint *addr, uint newval)
   return result;
 }
 
+static inline int 
+cas(volatile void *addr, int expected, int newval){
+    int ret;
+    asm volatile (
+            "lock; cmpxchg %3, %1\n\t"
+            "pushfl\n\t"
+            "popl %%eax\n\t"
+            "andl $0x0040, %%eax\n\t"
+            "shrl $6, %%eax\n\t"
+            "movl %%eax, %0" 
+            : "=r"(ret), "+m"(*(int*)addr) , "+a"(expected) 
+            : "r"(newval)
+            : "memory");
+
+return ret;
+}
+
 static inline uint
 rcr2(void)
 {
